@@ -1,0 +1,27 @@
+application:
+  name: airflow
+  pods:
+  - name: app
+    image: apache/airflow:2.9.0
+    path: /
+    servicePorts:
+    - 8080
+    vars:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow:airflow@postgres.pod:5432/airflow"
+      AIRFLOW__CORE__FERNET_KEY: "46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLt0nFHTJY="
+      AIRFLOW__WEBSERVER__SECRET_KEY: "a1b2c3d4"
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+  - name: postgres
+    image: postgres:16-alpine
+    servicePorts:
+    - 5432
+    vars:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+    - name: airflow-db
+      mountPath: /var/lib/postgresql/data
+      size: 10Gi
