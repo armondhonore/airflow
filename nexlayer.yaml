@@ -2,7 +2,7 @@ application:
   name: airflow
   pods:
   - name: app
-    image: apache/airflow:2.9.0
+    image: registry.nexlayer.io/user_01kece1xyh817dwff7wnarhkxd/airflow:19f15a78c94
     path: /
     servicePorts:
     - 8080
