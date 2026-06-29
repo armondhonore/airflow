@@ -7,12 +7,12 @@ application:
     servicePorts:
     - 8080
     vars:
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow:airflow@airflow-postgres.pod:5432/airflow"
-  - name: airflow-postgres
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow:${POSTGRES_PASSWORD}@airflow-pgdb.pod:5432/airflow"
+  - name: airflow-pgdb
     image: postgres:16-alpine
     servicePorts:
     - 5432
     vars:
       POSTGRES_DB: airflow
       POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
