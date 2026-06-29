@@ -2,7 +2,7 @@ application:
   name: airflow
   pods:
   - name: app
-    image: apache/airflow:2.9.0
+    image: mirror.gcr.io/apache/airflow:2.9.0
     path: /
     servicePorts:
     - 8080
@@ -14,7 +14,7 @@ application:
       _AIRFLOW_WWW_USER_USERNAME: admin
       _AIRFLOW_WWW_USER_PASSWORD: admin
   - name: postgres
-    image: postgres:16-alpine
+    image: mirror.gcr.io/library/postgres:16-alpine
     servicePorts:
     - 5432
     vars:
