@@ -1,11 +1,18 @@
 FROM apache/airflow:2.9.0
 
-# `airflow standalone` initializes the metadata DB (sqlite by default), creates an
-# admin user, and runs webserver (UI on :8080) + scheduler in one process — ideal
-# for a single-pod deploy. The nexlayer schema has no command field, so the serve
-# command is baked here. The base image's /entrypoint (under dumb-init) takes the
-# airflow subcommand as CMD args, so we keep that entrypoint and only set CMD.
+# Single-pod `airflow standalone` (sqlite): auto-migrates the metadata DB, creates an
+# admin user, and runs webserver (UI :8080) + scheduler + triggerer in one process.
+# The schema has no command field, so the serve command is baked as CMD; the base
+# image's dumb-init /entrypoint takes the airflow subcommand as args.
+#
+# Trim memory/startup footprint so the single pod does not OOM-crash-loop: 1 sync
+# gunicorn worker, no example DAGs, SequentialExecutor (sqlite default).
 ENV AIRFLOW__CORE__LOAD_EXAMPLES=False \
+    AIRFLOW__CORE__EXECUTOR=SequentialExecutor \
+    AIRFLOW__WEBSERVER__WORKERS=1 \
+    AIRFLOW__WEBSERVER__WORKER_CLASS=sync \
+    AIRFLOW__WEBSERVER__WEB_SERVER_HOST=0.0.0.0 \
+    AIRFLOW__WEBSERVER__WEB_SERVER_PORT=8080 \
     _AIRFLOW_WWW_USER_USERNAME=admin \
     _AIRFLOW_WWW_USER_PASSWORD=admin
 
