@@ -2,7 +2,17 @@ application:
   name: airflow
   pods:
   - name: app
-    image: registry.nexlayer.io/user_01kece1xyh817dwff7wnarhkxd/airflow:19f159b919f
+    image: apache/airflow:2.9.0
     path: /
     servicePorts:
     - 8080
+    vars:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow:airflow@airflow-postgres.pod:5432/airflow"
+  - name: airflow-postgres
+    image: postgres:16-alpine
+    servicePorts:
+    - 5432
+    vars:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow

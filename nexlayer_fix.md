@@ -1,8 +1,11 @@
 # Pinned fix — airflow (#153)
 
-Single-pod deploy using `airflow standalone` (sqlite). Standalone auto-migrates the
-metadata DB, creates the admin user, and runs webserver+scheduler with the UI on :8080.
-The Dockerfile bakes CMD ["standalone"] because the schema has no command field.
-NO separate postgres pod (sqlite is self-contained — avoids the postgres.pod shared-ns
-DNS collision). DO NOT add postgres, DO NOT restore the upstream Dockerfile, DO NOT
-change the port.
+Airflow webserver pod + dedicated Postgres pod. Use Postgres (NOT sqlite): the
+webserver runs a mandatory FAB permission sync on every boot (hundreds of writes)
+that is too slow on sqlite — the readiness probe kills the webserver before it binds
+:8080 -> CrashLoopBackOff. Postgres makes the sync fast so it binds quickly.
+The DB pod is named airflow-postgres (NOT "postgres") to avoid the shared-namespace
+postgres.pod DNS collision; the conn string uses airflow-postgres.pod:5432.
+The Dockerfile bakes CMD ["webserver"] + _AIRFLOW_DB_MIGRATE/_AIRFLOW_WWW_USER_CREATE
+so the base entrypoint migrates + creates admin before serving. DO NOT switch to sqlite,
+DO NOT rename the db pod to "postgres", DO NOT change ports.
