@@ -8,6 +8,10 @@ application:
     - 8080
     vars:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://airflow:${POSTGRES_PASSWORD}@airflow-pgdb.pod:5432/airflow"
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
   - name: airflow-pgdb
     image: postgres:16-alpine
     servicePorts:
